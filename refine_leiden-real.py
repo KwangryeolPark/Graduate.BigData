@@ -13,10 +13,9 @@ from tqdm import tqdm
 from sklearn.metrics import normalized_mutual_info_score
 
 iter = 2
-data_number = 2
 
 report = {
-    'Data number': [],
+    'Data name': [],
     'Original NMI': [],
     'Sub NMI': [],
     'Improvement': [],
@@ -27,13 +26,13 @@ report = {
     'Child clusters': [],
 }
 
-for data_number in range(1, 11):
+for data_name in ['dolphin', 'football', 'karate', 'mexican', 'polbooks', 'railway', 'strike']:
     division_count = 0
     mother_n_clusters = 0
     child_n_clusters = 0
     
-    data_path = f'dataset/TC1-{data_number}/1-{data_number}.dat'
-    label_path = f'dataset/TC1-{data_number}/1-{data_number}-c.dat'
+    data_path = f'dataset/{data_name}/network.dat'
+    label_path = f'dataset/{data_name}/community.dat'
 
     data = np.loadtxt(data_path).astype(int)
     graph = ig.Graph(data, directed=False)
@@ -72,7 +71,7 @@ for data_number in range(1, 11):
 
     n_of_valid_vertices = 0
     mother_modularity = original_modularity
-    for cluster_index, cluster_vertices in tqdm(enumerate(partition), total=len(partition), desc=f'Data number: {data_number}'):
+    for cluster_index, cluster_vertices in tqdm(enumerate(partition), total=len(partition), desc=f'Data name: {data_name}'):
         new_graph = []
         for index in range(len(data)):
             node1, node2 = data[index]
@@ -167,14 +166,14 @@ for data_number in range(1, 11):
 
     pred_labels = np.array(pred_labels)
     sub_nmi = normalized_mutual_info_score(answer[1], pred_labels)
-    print(f"Data number: {data_number}")
+    print(f"Data number: {data_name}")
     print(f"Ori NMI: {original_nmi}")
     print(f"Sub NMI: {sub_nmi}")
 
     print("Improvement: ", sub_nmi - original_nmi, "Percentage: ", (sub_nmi - original_nmi) / original_nmi * 100)
     print(f"Original modularity: {original_modularity}")
     
-    report['Data number'].append(data_number)
+    report['Data name'].append(data_name)
     report['Original NMI'].append(original_nmi)
     report['Sub NMI'].append(sub_nmi)
     report['Improvement'].append(sub_nmi - original_nmi)
@@ -186,4 +185,4 @@ for data_number in range(1, 11):
     
 
 df = pd.DataFrame(report)
-df.to_csv('refine_leiden-TC1.csv', index=False)
+df.to_csv('refine_leiden-real.csv', index=False)
